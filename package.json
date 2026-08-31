@@ -1,0 +1,31 @@
+{
+  "name": "digitora-leadai",
+  "version": "0.1.0",
+  "description": "AI-powered lead discovery, outreach, and CRM automation for Digitora Solutions.",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names web,api,worker --prefix-colors cyan,green,magenta \"npm run dev --workspace @digitora/web\" \"npm run dev --workspace @digitora/api\" \"npm run dev --workspace @digitora/worker\"",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test --workspaces --if-present",
+    "check": "npm run format:check && npm run lint && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.34.0",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2"
+  }
+}

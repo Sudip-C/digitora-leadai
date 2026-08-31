@@ -33,6 +33,23 @@ supabase/      Database migrations and seed configuration
 docs/          System design and implementation documentation
 ```
 
+## Local development
+
+Requirements: Node.js 20 or newer and npm 10 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Run all quality checks:
+
+```bash
+npm run check
+```
+
+See the [local development guide](docs/local-development.md) for complete setup instructions.
+
 ## Development plan
 
 The first production pilot is planned across five weeks:
