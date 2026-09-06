@@ -15,6 +15,6 @@ const server = app.listen(env.API_PORT, () => {
 });
 
 server.on("error", (error) => {
-  logger.fatal({ error }, "API server failed to start");
+  logger.fatal({ err: error }, "API server failed to start");
   process.exitCode = 1;
 });
