@@ -50,7 +50,7 @@ export default defineConfig([
         "error",
         {
           allowConstantExport: true,
-          allowExportNames: ["useToast"],
+          allowExportNames: ["useToast", "useAuth"],
         },
       ],
     },
