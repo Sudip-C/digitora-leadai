@@ -14,6 +14,11 @@ const environmentSchema = z.object({
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   WEB_ORIGIN: z.url().default("http://localhost:5173"),
   APP_TIMEZONE: z.string().trim().min(1).default(DEFAULT_TIMEZONE),
+  SUPABASE_URL: z.url(),
+  SUPABASE_PUBLISHABLE_KEY: z
+    .string()
+    .trim()
+    .regex(/^sb_publishable_/, "must be a Supabase publishable key"),
 });
 
 export function parseEnvironment(source) {
