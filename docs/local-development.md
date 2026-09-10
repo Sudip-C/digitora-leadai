@@ -5,7 +5,7 @@ This guide explains how to run the Digitora LeadAI monorepo locally.
 ## Requirements
 
 - Git
-- Node.js 20 or newer
+- Node.js 22 or newer
 - npm 10 or newer
 - VS Code or another code editor
 
@@ -86,4 +86,17 @@ npm test --workspace @digitora/config
 | `@digitora/worker` | Background jobs and scheduling |
 | `@digitora/config` | Shared application constants   |
 
-React, Express, Supabase, Redis, NVIDIA Nemotron, and WhatsApp are added in their dedicated project parts.
+React, Express, and Supabase authentication are configured. Redis, NVIDIA Nemotron, and WhatsApp will be added in later project parts.
+
+## Supabase and authentication
+
+Digitora LeadAI uses a hosted Supabase project for authentication and PostgreSQL.
+
+Add the project URL and publishable key to `.env`:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```

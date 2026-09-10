@@ -35,7 +35,7 @@ docs/          System design and implementation documentation
 
 ## Local development
 
-Requirements: Node.js 20 or newer and npm 10 or newer.
+Requirements: Node.js 22 or newer and npm 10 or newer.
 
 ```bash
 npm install
@@ -49,6 +49,7 @@ npm run check
 ```
 
 See the [local development guide](docs/local-development.md) for complete setup instructions.
+For environment variables, hosted Auth configuration, protected routes, and security rules, see the [Supabase authentication guide](docs/supabase-authentication.md).
 
 ## Development plan
 
@@ -64,7 +65,9 @@ See [the complete system design](docs/system-design.md).
 
 ## Status
 
-Initial repository foundation. Implementation begins with Milestone 1: authentication, Supabase schema, organization roles and lead CRM.
+Parts 1–4 are complete: monorepo foundation, frontend design system, Express API foundation, Supabase tenant schema, and authenticated web and API routes.
+
+Next: build the core lead CRM domain and workflows.
 
 ## License
 
