@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Menu } from "lucide-react";
 import { Outlet, useLocation } from "react-router";
+import AccountMenu from "../components/navigation/AccountMenu.jsx";
 
 import { MobileNavigation } from "../components/navigation/MobileNavigation.jsx";
 import Sidebar from "../components/navigation/Sidebar.jsx";
@@ -64,9 +65,7 @@ export default function AppShell() {
               </div>
             </div>
 
-            <span className="hidden rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 sm:inline-flex">
-              Part 02
-            </span>
+            <AccountMenu />
           </div>
         </header>
 

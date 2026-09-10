@@ -40,7 +40,10 @@ function createAuthClient(initialSession) {
 
     signUp: vi.fn(),
     signInWithPassword: vi.fn(),
-    signOut: vi.fn(),
+    signOut: vi.fn(async () => {
+      authStateListener("SIGNED_OUT", null);
+      return { error: null };
+    }),
   };
 
   return {
@@ -171,5 +174,33 @@ describe("Digitora LeadAI application", () => {
         level: 2,
       }),
     ).toBeInTheDocument();
+  });
+  it("signs out the current session and redirects to login", async () => {
+    const user = userEvent.setup();
+    const { authClient } = renderApp();
+
+    const signOutButton = await screen.findByRole("button", {
+      name: "Sign out",
+    });
+
+    await user.click(signOutButton);
+
+    expect(authClient.client.auth.signOut).toHaveBeenCalledWith({
+      scope: "local",
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Welcome back",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("navigation", {
+        name: "Primary navigation",
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByText("Signed out")).toBeInTheDocument();
   });
 });

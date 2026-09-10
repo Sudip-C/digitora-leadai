@@ -198,6 +198,9 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(mockClient.auth.signOut).toHaveBeenCalledOnce();
+      expect(mockClient.auth.signOut).toHaveBeenCalledWith({
+        scope: "local",
+      });
     });
 
     expect(screen.getByText("Signed out")).toBeInTheDocument();
