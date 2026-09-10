@@ -1,19 +1,76 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import App from "../App.jsx";
+import { AuthProvider } from "../auth/AuthContext.jsx";
 import { ToastProvider } from "../components/ui/index.js";
 
-function renderApp(path = "/") {
-  return render(
+const authenticatedSession = {
+  access_token: "access-token",
+  user: {
+    id: "user-1",
+    email: "sudip@example.com",
+  },
+};
+
+function createAuthClient(initialSession) {
+  let authStateListener;
+
+  const auth = {
+    getSession: vi.fn().mockResolvedValue({
+      data: {
+        session: initialSession,
+      },
+      error: null,
+    }),
+
+    onAuthStateChange: vi.fn((listener) => {
+      authStateListener = listener;
+
+      return {
+        data: {
+          subscription: {
+            unsubscribe: vi.fn(),
+          },
+        },
+      };
+    }),
+
+    signUp: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signOut: vi.fn(),
+  };
+
+  return {
+    client: {
+      auth,
+    },
+
+    emitAuthChange(event, session) {
+      authStateListener(event, session);
+    },
+  };
+}
+
+function renderApp(path = "/", session = authenticatedSession) {
+  const authClient = createAuthClient(session);
+
+  const renderedApp = render(
     <MemoryRouter initialEntries={[path]}>
       <ToastProvider>
-        <App />
+        <AuthProvider client={authClient.client}>
+          <App />
+        </AuthProvider>
       </ToastProvider>
     </MemoryRouter>,
   );
+
+  return {
+    ...renderedApp,
+    authClient,
+  };
 }
 
 describe("Digitora LeadAI application", () => {
@@ -22,8 +79,10 @@ describe("Digitora LeadAI application", () => {
 
     renderApp();
 
+    const main = await screen.findByRole("main");
+
     expect(
-      within(screen.getByRole("main")).getByRole("heading", {
+      within(main).getByRole("heading", {
         name: "Overview",
       }),
     ).toBeInTheDocument();
@@ -58,7 +117,7 @@ describe("Digitora LeadAI application", () => {
 
     renderApp();
 
-    const menuButton = screen.getByRole("button", {
+    const menuButton = await screen.findByRole("button", {
       name: "Open navigation",
     });
 
@@ -74,5 +133,43 @@ describe("Digitora LeadAI application", () => {
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(menuButton).toHaveFocus();
+  });
+
+  it("redirects unauthenticated users and returns them to their requested route", async () => {
+    const { authClient } = renderApp("/leads", null);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Welcome back",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("navigation", {
+        name: "Primary navigation",
+      }),
+    ).not.toBeInTheDocument();
+
+    act(() => {
+      authClient.emitAuthChange("SIGNED_IN", authenticatedSession);
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Leads",
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("redirects authenticated users away from the login page", async () => {
+    renderApp("/login");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Overview",
+        level: 2,
+      }),
+    ).toBeInTheDocument();
   });
 });
