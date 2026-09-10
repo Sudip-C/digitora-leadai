@@ -97,4 +97,48 @@ describe("API foundation", () => {
       },
     });
   });
+  test("rejects unauthenticated access to protected API routes", async () => {
+    const response = await request(app)
+      .get("/api/v1/me")
+      .set("X-Request-Id", "unauthenticated-test")
+      .expect(401);
+
+    expect(response.body).toEqual({
+      error: {
+        code: "AUTHENTICATION_REQUIRED",
+        message: "A valid bearer token is required.",
+        requestId: "unauthenticated-test",
+      },
+    });
+  });
+
+  test("returns verified identity from a protected API route", async () => {
+    const authenticatedApp = createApp({
+      environment: {
+        WEB_ORIGIN: ALLOWED_ORIGIN,
+      },
+      logger: silentLogger,
+      authenticationMiddleware(request, _response, next) {
+        request.auth = {
+          userId: "user-1",
+          claims: {
+            email: "sudip@example.com",
+          },
+        };
+
+        next();
+      },
+    });
+
+    const response = await request(authenticatedApp).get("/api/v1/me").expect(200);
+
+    expect(response.body).toEqual({
+      data: {
+        user: {
+          id: "user-1",
+          email: "sudip@example.com",
+        },
+      },
+    });
+  });
 });

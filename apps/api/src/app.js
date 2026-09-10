@@ -9,13 +9,18 @@ import { errorHandler } from "./middleware/error-handler.js";
 import { createHttpLogger } from "./middleware/http-logger.js";
 import { notFoundHandler } from "./middleware/not-found.js";
 import { healthRouter } from "./routes/health.routes.js";
-import { apiV1Router } from "./routes/v1.routes.js";
+import { createApiV1Router } from "./routes/v1.routes.js";
+import { createRequireAuthentication } from "./middleware/require-authentication.js";
 
 const ALLOWED_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
 
 const ALLOWED_HEADERS = ["Authorization", "Content-Type", "X-Request-Id", "Idempotency-Key"];
 
-export function createApp({ environment = env, logger = applicationLogger } = {}) {
+export function createApp({
+  environment = env,
+  logger = applicationLogger,
+  authenticationMiddleware = createRequireAuthentication({ environment }),
+} = {}) {
   const app = express();
 
   app.disable("x-powered-by");
@@ -37,8 +42,12 @@ export function createApp({ environment = env, logger = applicationLogger } = {}
   app.use(express.json({ limit: "1mb" }));
 
   app.use(healthRouter);
-  app.use(`/api/${API_VERSION}`, apiV1Router);
-
+  app.use(
+    `/api/${API_VERSION}`,
+    createApiV1Router({
+      authenticationMiddleware,
+    }),
+  );
   app.use(notFoundHandler);
   app.use(errorHandler);
 
